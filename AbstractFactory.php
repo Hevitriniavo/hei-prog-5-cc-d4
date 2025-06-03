@@ -57,16 +57,38 @@ interface ToyFactory {
     }
  }
 
+
+
 abstract class AbstractToyFactory {
-    public static function makeToy(ToyFactory $factory, string $type) : Toy {
-        if ('child' === $type) {
-            return $factory->makeForChild();
+    private static ToyFactory $factory;
+
+    public static function setFactory(ToyFactory $factory): void {
+        self::$factory = $factory;
+    }
+
+    public static function makeToy(string $type): Toy {
+        if (!isset(self::$factory)) {
+            self::$factory = new CarFactory();
         }
 
-        return $factory->makeForKids();
+        if ($type === 'child') {
+            return self::$factory->makeForChild();
+        }
+        return self::$factory->makeForKids();
     }
 }
 
-$myToy = AbstractToyFactory::makeToy(new CarFactory(), "child");
-var_dump($myToy);die();
-$myToy.play();
+
+$myToy = AbstractToyFactory::makeToy("child");
+echo $myToy->play();
+
+$myToy = AbstractToyFactory::makeToy("kids");
+echo $myToy->play();
+
+AbstractToyFactory::setFactory(new DollFactory());
+
+$myToy = AbstractToyFactory::makeToy("child");
+echo $myToy->play();
+
+$myToy = AbstractToyFactory::makeToy("kids");
+echo $myToy->play();
